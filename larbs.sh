@@ -14,8 +14,8 @@ while getopts ":a:r:b:p:h" o; do case "${o}" in
 	*) printf "Invalid option: -%s\\n" "$OPTARG" && exit 1 ;;
 esac done
 
-[ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/lukesmithxyz/voidrice.git"
-[ -z "$progsfile" ] && progsfile="https://raw.githubusercontent.com/LukeSmithxyz/AARBS/master/progs.csv"
+[ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/Hrothgar32/dotfiles.git"
+[ -z "$progsfile" ] && progsfile="https://raw.githubusercontent.com/Hrothgar32/LARBS/master/progs.csv"
 [ -z "$aurhelper" ] && aurhelper="yay"
 [ -z "$repobranch" ] && repobranch="master"
 
@@ -134,6 +134,11 @@ putgitrepo() { # Downloads a gitrepo $1 and places the files in $2 only overwrit
 	chown "$name":wheel "$dir" "$2"
 	sudo -u "$name" git clone --recursive -b "$branch" --depth 1 --recurse-submodules "$1" "$dir" >/dev/null 2>&1
 	sudo -u "$name" cp -rfT "$dir" "$2"
+	cp -rf "$dir/backgrounds /usr/share"
+	cp -rf "$dir/lightdm /etc"
+	rm -rf "$dir/backgrounds"
+	rm -rf "$dir/lightdm"
+	ln -f "$dir/.doom.d/exwm/exwm.desktop /usr/share/xsessions/exwm.desktop"
 	}
 
 systembeepoff() { dialog --infobox "Getting rid of that retarded error beep sound..." 10 50
@@ -169,7 +174,7 @@ preinstallmsg || error "User exited."
 # Refresh Arch keyrings.
 refreshkeys || error "Error automatically refreshing Arch keyring. Consider doing so manually."
 
-for x in curl base-devel git  bash; do
+for x in curl base-devel git ntp bash; do
 	dialog --title "AARBS Installation" --infobox "Installing \`$x\` which is required to install and configure other programs." 5 70
 	installpkg "$x"
 done
@@ -200,26 +205,17 @@ manualinstall $aurhelper || error "Failed to install AUR helper."
 # and all build dependencies are installed.
 installationloop
 
-dialog --title "AARBS Installation" --infobox "Finally, installing \`libxft-bgra\` to enable color emoji in suckless software without crashes." 5 70
-yes | sudo -u "$name" $aurhelper -S libxft-bgra-git >/dev/null 2>&1
-
 # Install the dotfiles in the user's home directory
 putgitrepo "$dotfilesrepo" "/home/$name" "$repobranch"
-rm -f "/home/$name/README.md" "/home/$name/LICENSE" "/home/$name/FUNDING.yml"
-# Create default urls file if none exists.
-[ ! -f "/home/$name/.config/newsboat/urls" ] && echo "http://lukesmith.xyz/rss.xml
-https://notrelated.libsyn.com/rss
-https://www.youtube.com/feeds/videos.xml?channel_id=UC2eYFnH61tmytImy1mTYvhA \"~Luke Smith (YouTube)\"
-https://www.archlinux.org/feeds/news/" > "/home/$name/.config/newsboat/urls"
+# Most important step! Install Doom Emacs
+dialog --infobox "Downloading and installing Doom Emacs..." 4 60
+sudo -u "$name" git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d"; "home/$name/.emacs.d/bin/doom install"
+rm -f "/home/$name/README.org"
 # make git ignore deleted LICENSE & README.md files
-git update-index --assume-unchanged "/home/$name/README.md" "/home/$name/LICENSE" "/home/$name/FUNDING.yml"
+git update-index --assume-unchanged "/home/$name/README.md"
 
 # Most important command! Get rid of the beep!
 systembeepoff
-
-# Make zsh the default shell for the user.
-chsh -s /bin/zsh "$name" >/dev/null 2>&1
-sudo -u "$name" mkdir -p "/home/$name/.cache/zsh/"
 
 # dbus UUID must be generated for Artix runit.
 dbus-uuidgen > /var/lib/dbus/machine-id
@@ -240,6 +236,8 @@ grep -q "OTHER_OPTS='-a pulseaudio -m alsa_seq -r 48000'" /etc/conf.d/fluidsynth
 
 # Start/restart PulseAudio.
 killall pulseaudio; sudo -u "$name" pulseaudio --start
+# Enable ligthdm
+systemctl enable lightdm
 
 # This line, overwriting the `newperms` command above will allow the user to run
 # serveral important commands, `shutdown`, `reboot`, updating, etc. without a password.
