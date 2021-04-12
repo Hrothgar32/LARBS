@@ -138,7 +138,6 @@ putgitrepo() { # Downloads a gitrepo $1 and places the files in $2 only overwrit
 	cp -rf "$dir/lightdm /etc"
 	rm -rf "$dir/backgrounds"
 	rm -rf "$dir/lightdm"
-	mkdir /usr/share/xsessions
 	ln -f "$dir/.doom.d/exwm/exwm.desktop /usr/share/xsessions/exwm.desktop"
 	}
 
