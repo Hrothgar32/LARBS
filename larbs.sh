@@ -211,7 +211,7 @@ installationloop
 putgitrepo "$dotfilesrepo" "/home/$name" "$repobranch"
 # Most important step! Install Doom Emacs
 dialog --infobox "Downloading and installing Doom Emacs..." 4 60
-sudo -u "$name" git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d"; home/$name/.emacs.d/bin/doom install
+sudo -u "$name" git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d"; sudo -u "$name" /home/$name/.emacs.d/bin/doom install
 rm -f "/home/$name/README.org"
 # make git ignore deleted LICENSE & README.md files
 git update-index --assume-unchanged "/home/$name/README.md"
