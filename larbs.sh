@@ -135,7 +135,7 @@ putgitrepo() { # Downloads a gitrepo $1 and places the files in $2 only overwrit
 	sudo -u "$name" git clone --recursive -b "$branch" --depth 1 --recurse-submodules "$1" "$dir" >/dev/null 2>&1
 	sudo -u "$name" cp -rfT "$dir" "$2"
 	cp -rf "$dir/backgrounds /usr/share"
-	cp -rf "$dir/.doom.d ."
+	cp -rf "$dir/.doom.d" .
 	cp -rf "$dir/lightdm /etc"
 	rm -rf "$dir/backgrounds"
 	rm -rf "$dir/lightdm"
@@ -222,7 +222,7 @@ git clone https://github.com/Litarvan/lightdm-webkit-theme-litarvan.git
 cd lightdm-webkit-theme-litarvan
 ./build.sh
 mkdir /usr/share/lightdm-webkit/themes/litarvan
-cp lightdm-webkit-theme-litarvan* /usr/share/lightdm-webkit-themes/litarvan
+cp lightdm-webkit-theme-litarvan* /usr/share/lightdm-webkit/themes/litarvan
 cd /usr/share/lightdm-webkit/themes/litarvan
 tar -xf lightdm-webkit-theme-litarvan*
 
