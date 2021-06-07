@@ -148,8 +148,8 @@ systembeepoff() { dialog --infobox "Getting rid of that retarded error beep soun
 	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf ;}
 
 finalize(){ \
-	dialog --infobox "Preparing welcome message..." 4 50
-	dialog --title "All done!" --msgbox "Congrats! Provided there were no hidden errors, the script completed successfully and all the programs and configuration files should be in place.\\n\\nTo run the new graphical environment, log out and log back in as your new user, then run the command \"startx\" to start the graphical environment (it will start automatically in tty1).\\n\\n.t Luke" 12 80
+	# dialog --infobox "Preparing welcome message..." 4 50
+	# dialog --title "All done!" --msgbox "Congrats! Provided there were no hidden errors, the script completed successfully and all the programs and configuration files should be in place.\\n\\nTo run the new graphical environment, log out and log back in as your new user, then run the command \"startx\" to start the graphical environment (it will start automatically in tty1).\\n\\n.t Luke" 12 80
 	}
 
 ### THE ACTUAL SCRIPT ###
@@ -177,7 +177,7 @@ preinstallmsg || error "User exited."
 refreshkeys || error "Error automatically refreshing Arch keyring. Consider doing so manually."
 
 for x in curl base-devel git ntp bash; do
-	dialog --title "AARBS Installation" --infobox "Installing \`$x\` which is required to install and configure other programs." 5 70
+	# dialog --title "AARBS Installation" --infobox "Installing \`$x\` which is required to install and configure other programs." 5 70
 	installpkg "$x"
 done
 
@@ -210,14 +210,14 @@ installationloop
 # Install the dotfiles in the user's home directory
 putgitrepo "$dotfilesrepo" "/home/$name" "$repobranch"
 # Most important step! Install Doom Emacs
-dialog --infobox "Downloading and installing Doom Emacs..." 4 60
+# dialog --infobox "Downloading and installing Doom Emacs..." 4 60
 sudo -u "$name" git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d"; sudo -u "$name" /home/$name/.emacs.d/bin/doom install
 rm -f "/home/$name/README.org"
 # make git ignore deleted LICENSE & README.md files
 git update-index --assume-unchanged "/home/$name/README.md"
 
 #pull down lightdm-webkit-theme-litarvan
-dialog --infobox "Configuring lightdm theme..." 4 60
+# dialog --infobox "Configuring lightdm theme..." 4 60
 git clone https://github.com/Litarvan/lightdm-webkit-theme-litarvan.git
 cd lightdm-webkit-theme-litarvan
 ./build.sh
