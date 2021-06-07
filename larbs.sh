@@ -128,19 +128,12 @@ installationloop() { \
 
 putgitrepo() { # Downloads a gitrepo $1 and places the files in $2 only overwriting conflicts
 	dialog --infobox "Downloading and installing config files..." 4 60
-	[ -z "$3" ] && branch="master" || branch="$repobranch"
-	dir=$(mktemp -d)
-	[ ! -d "$2" ] && mkdir -p "$2"
-	chown "$name":wheel "$dir" "$2"
-	sudo -u "$name" git clone --recursive -b "$branch" --depth 1 --recurse-submodules "$1" "$dir" >/dev/null 2>&1
-	sudo -u "$name" cp -rfT "$dir" "$2"
-	cp -rf "$dir/backgrounds /usr/share"
-	cp -rf "$dir/.doom.d" .
-	cp -rf "$dir/lightdm /etc"
-	rm -rf "$dir/backgrounds"
-	rm -rf "$dir/lightdm"
+	git clone  "$1"
+	cp -rfT dotfiles/* /home/"$name"
+	cp -rf  dotfiles/backgrounds /usr/share
+	cp -rf  dotfiles/lightdm/* /etc/lightdm
 	mkdir /usr/share/xsessions
-	ln -f "$dir/.doom.d/exwm/exwm.desktop /usr/share/xsessions/exwm.desktop"
+	ln -f dotfiles/.doom.d/exwm/exwm.desktop /usr/share/xsessions/exwm.desktop
 	}
 
 systembeepoff() { dialog --infobox "Getting rid of that retarded error beep sound..." 10 50
@@ -211,7 +204,8 @@ installationloop
 putgitrepo "$dotfilesrepo" "/home/$name" "$repobranch"
 # Most important step! Install Doom Emacs
 dialog --infobox "Downloading and installing Doom Emacs..." 4 60
-sudo -u "$name" git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d"; sudo -u "$name" /home/$name/.emacs.d/bin/doom install
+sudo -u "$name" git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d"
+sudo -u "$name" yes | /home/$name/.emacs.d/bin/doom install
 rm -f "/home/$name/README.org"
 # make git ignore deleted LICENSE & README.md files
 git update-index --assume-unchanged "/home/$name/README.md"
@@ -249,7 +243,7 @@ grep -q "OTHER_OPTS='-a pulseaudio -m alsa_seq -r 48000'" /etc/conf.d/fluidsynth
 # Start/restart PulseAudio.
 killall pulseaudio; sudo -u "$name" pulseaudio --start
 # Enable ligthdm
-systemctl enable lightdm
+# systemctl enable lightdm
 
 # This line, overwriting the `newperms` command above will allow the user to run
 # serveral important commands, `shutdown`, `reboot`, updating, etc. without a password.
