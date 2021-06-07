@@ -248,6 +248,7 @@ newperms "%wheel ALL=(ALL) ALL #AARBS
 # Getting dotfiles
 su $name
 cd ~
+rm -rf ~/.*
 git clone --separate-git-dir=~/.dotfiles https://github.com/Hrothgar32/dotfiles ~
 sudo cp -rf ~/.lightdm/* /etc/lightdm
 sudo cp -rf ~/.backgrounds/* /usr/share/backgrounds/
