@@ -135,6 +135,7 @@ putgitrepo() { # Downloads a gitrepo $1 and places the files in $2 only overwrit
 	sudo -u "$name" git clone --recursive -b "$branch" --depth 1 --recurse-submodules "$1" "$dir" >/dev/null 2>&1
 	sudo -u "$name" cp -rfT "$dir" "$2"
 	cp -rf "$dir/backgrounds /usr/share"
+	cp -rf "$dir/.doom.d ."
 	cp -rf "$dir/lightdm /etc"
 	rm -rf "$dir/backgrounds"
 	rm -rf "$dir/lightdm"
@@ -210,10 +211,20 @@ installationloop
 putgitrepo "$dotfilesrepo" "/home/$name" "$repobranch"
 # Most important step! Install Doom Emacs
 dialog --infobox "Downloading and installing Doom Emacs..." 4 60
-sudo -u "$name" git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d"; "home/$name/.emacs.d/bin/doom install"
+sudo -u "$name" git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d"; home/$name/.emacs.d/bin/doom install
 rm -f "/home/$name/README.org"
 # make git ignore deleted LICENSE & README.md files
 git update-index --assume-unchanged "/home/$name/README.md"
+
+#pull down lightdm-webkit-theme-litarvan
+dialog --infobox "Configuring lightdm theme..." 4 60
+git clone https://github.com/Litarvan/lightdm-webkit-theme-litarvan.git
+cd lightdm-webkit-theme-litarvan
+./build.sh
+mkdir /usr/share/lightdm-webkit/themes/litarvan
+cp lightdm-webkit-theme-litarvan* /usr/share/lightdm-webkit-themes/litarvan
+cd /usr/share/lightdm-webkit/themes/litarvan
+tar -xf lightdm-webkit-theme-litarvan*
 
 # Most important command! Get rid of the beep!
 systembeepoff
