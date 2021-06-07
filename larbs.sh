@@ -200,15 +200,6 @@ manualinstall $aurhelper || error "Failed to install AUR helper."
 # and all build dependencies are installed.
 installationloop
 
-# Install the dotfiles in the user's home directory
-putgitrepo "$dotfilesrepo" "/home/$name" "$repobranch"
-# Most important step! Install Doom Emacs
-dialog --infobox "Downloading and installing Doom Emacs..." 4 60
-sudo -u "$name" git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d"
-sudo -u "$name" yes | /home/$name/.emacs.d/bin/doom install
-rm -f "/home/$name/README.org"
-# make git ignore deleted LICENSE & README.md files
-git update-index --assume-unchanged "/home/$name/README.md"
 
 #pull down lightdm-webkit-theme-litarvan
 dialog --infobox "Configuring lightdm theme..." 4 60
@@ -220,6 +211,10 @@ cp lightdm-webkit-theme-litarvan* /usr/share/lightdm-webkit/themes/litarvan
 cd /usr/share/lightdm-webkit/themes/litarvan
 tar -xf lightdm-webkit-theme-litarvan*
 
+rm -f "/home/$name/README.org"
+
+# make git ignore deleted LICENSE & README.md files
+git update-index --assume-unchanged "/home/$name/README.md"
 # Most important command! Get rid of the beep!
 systembeepoff
 
@@ -250,6 +245,16 @@ killall pulseaudio; sudo -u "$name" pulseaudio --start
 newperms "%wheel ALL=(ALL) ALL #AARBS
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/packer -Syu,/usr/bin/packer -Syyu,/usr/bin/systemctl restart NetworkManager,/usr/bin/rc-service NetworkManager restart,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/yay,/usr/bin/pacman -Syyuw --noconfirm"
 
+# Getting dotfiles
+su $name
+cd ~
+git clone --separate-git-dir=~/.dotfiles https://github.com/Hrothgar32/dotfiles ~
+sudo cp -rf ~/.lightdm/* /etc/lightdm
+sudo cp -rf ~/.backgrounds/* /usr/share/backgrounds/
+# Most important step! Install Doom Emacs
+dialog --infobox "Downloading and installing Doom Emacs..." 4 60
+git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d"
+yes | /home/$name/.emacs.d/bin/doom install
 # Last message! Install complete!
 finalize
 clear
