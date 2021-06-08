@@ -126,20 +126,6 @@ installationloop() { \
 		esac
 	done < /tmp/progs.csv ;}
 
-putgitrepo() { # Downloads a gitrepo $1 and places the files in $2 only overwriting conflicts
-	dialog --infobox "Downloading and installing config files..." 4 60
-	git clone  "$1"
-	cp -rfT dotfiles/* /home/"$name"
-	cp -rf  dotfiles/backgrounds /usr/share
-	cp -rf  dotfiles/lightdm/* /etc/lightdm
-	mkdir /usr/share/xsessions
-	ln -f dotfiles/.doom.d/exwm/exwm.desktop /usr/share/xsessions/exwm.desktop
-	}
-
-systembeepoff() { dialog --infobox "Getting rid of that retarded error beep sound..." 10 50
-	rmmod pcspkr
-	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf ;}
-
 finalize(){ \
 	dialog --infobox "Preparing welcome message..." 4 50
 	dialog --title "All done!" --msgbox "Congrats! Provided there were no hidden errors, the script completed successfully and all the programs and configuration files should be in place.\\n\\nTo run the new graphical environment, log out and log back in as your new user, then run the command \"startx\" to start the graphical environment (it will start automatically in tty1).\\n\\n.t Luke" 12 80
@@ -203,20 +189,18 @@ installationloop
 
 #pull down lightdm-webkit-theme-litarvan
 dialog --infobox "Configuring lightdm theme..." 4 60
-git clone https://github.com/Litarvan/lightdm-webkit-theme-litarvan.git
+git clone https://github.com/Litarvan/lightdm-webkit-theme-litarvan.git &>/dev/null
 cd lightdm-webkit-theme-litarvan
-./build.sh
+./build.sh &>/dev/null
 mkdir /usr/share/lightdm-webkit/themes/litarvan
 cp lightdm-webkit-theme-litarvan* /usr/share/lightdm-webkit/themes/litarvan
 cd /usr/share/lightdm-webkit/themes/litarvan
-tar -xf lightdm-webkit-theme-litarvan*
+tar -xf lightdm-webkit-theme-litarvan* &>/dev/null
 
 rm -f "/home/$name/README.org"
 
 # make git ignore deleted LICENSE & README.md files
 git update-index --assume-unchanged "/home/$name/README.md"
-# Most important command! Get rid of the beep!
-systembeepoff
 
 # dbus UUID must be generated for Artix runit.
 dbus-uuidgen > /var/lib/dbus/machine-id
@@ -238,7 +222,7 @@ EndSection' > /etc/X11/xorg.conf.d/40-libinput.conf
 # Start/restart PulseAudio.
 # killall pulseaudio; sudo -u "$name" pulseaudio --start
 # Enable ligthdm
-# systemctl enable lightdm
+systemctl enable lightdm dhcpcd iwd
 
 # This line, overwriting the `newperms` command above will allow the user to run
 # serveral important commands, `shutdown`, `reboot`, updating, etc. without a password.
@@ -246,16 +230,18 @@ newperms "%wheel ALL=(ALL) ALL #AARBS
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/packer -Syu,/usr/bin/packer -Syyu,/usr/bin/systemctl restart NetworkManager,/usr/bin/rc-service NetworkManager restart,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/yay,/usr/bin/pacman -Syyuw --noconfirm"
 
 # Getting dotfiles
-su $name
-cd ~
-rm -rf ~/.*
-git clone --separate-git-dir=~/.dotfiles https://github.com/Hrothgar32/dotfiles ~
-sudo cp -rf ~/.lightdm/* /etc/lightdm
-sudo cp -rf ~/.backgrounds/* /usr/share/backgrounds/
+rm -rf /home/$name/.* 2>/dev/null
+sudo -u $name git clone --separate-git-dir=~/.dotfiles https://github.com/Hrothgar32/dotfiles ~ &>/dev/null
+cp -rf /home/$name/.lightdm/* /etc/lightdm
+cp -rf /home/$name/.backgrounds/* /usr/share/backgrounds/
+cp -rf /home/$name/.doom.d/exwm/exwm.desktop /usr/share/xsessions/exwm.desktop
+sed -i "s/~/\/home\/$name/" /usr/share/xsessions/exwm.desktop
 # Most important step! Install Doom Emacs
 dialog --infobox "Downloading and installing Doom Emacs..." 4 60
-git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d"
-yes | /home/$name/.emacs.d/bin/doom install
+sudo -u $name git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d"
+cd /home/$name/.emacs.d/bin
+sudo -u $name ./doom -y install &>/dev/null
 # Last message! Install complete!
+cd ~
 finalize
 clear
