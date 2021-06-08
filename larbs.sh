@@ -126,6 +126,20 @@ installationloop() { \
 		esac
 	done < /tmp/progs.csv ;}
 
+putgitrepo() { # Downloads a gitrepo $1 and places the files in $2 only overwriting conflicts
+	dialog --infobox "Downloading and installing config files..." 4 60
+	git clone  "$1"
+	cp -rfT dotfiles/* /home/"$name"
+	cp -rf  dotfiles/backgrounds /usr/share
+	cp -rf  dotfiles/lightdm/* /etc/lightdm
+	mkdir /usr/share/xsessions
+	ln -f dotfiles/.doom.d/exwm/exwm.desktop /usr/share/xsessions/exwm.desktop
+	}
+
+systembeepoff() { dialog --infobox "Getting rid of that retarded error beep sound..." 10 50
+	rmmod pcspkr
+	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf ;}
+
 finalize(){ \
 	dialog --infobox "Preparing welcome message..." 4 50
 	dialog --title "All done!" --msgbox "Congrats! Provided there were no hidden errors, the script completed successfully and all the programs and configuration files should be in place.\\n\\nTo run the new graphical environment, log out and log back in as your new user, then run the command \"startx\" to start the graphical environment (it will start automatically in tty1).\\n\\n.t Luke" 12 80
