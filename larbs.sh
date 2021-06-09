@@ -238,7 +238,7 @@ cp -rf /home/$name/.doom.d/exwm/exwm.desktop /usr/share/xsessions/exwm.desktop
 sed -i "s/~/\/home\/$name/" /usr/share/xsessions/exwm.desktop
 # Most important step! Install Doom Emacs
 dialog --infobox "Downloading and installing Doom Emacs..." 4 60
-sudo -u $name git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d"
+sudo -u $name git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d" &>/dev/null
 cd /home/$name/.emacs.d/bin
 sudo -u $name ./doom -y install &>/dev/null
 # Last message! Install complete!
