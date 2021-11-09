@@ -234,8 +234,6 @@ rm -rf /home/$name/.* 2>/dev/null
 sudo -u $name git clone --separate-git-dir=/home/$name/.dotfiles https://github.com/Hrothgar32/dotfiles /home/$name &>/dev/null
 cp -rf /home/$name/.lightdm/* /etc/lightdm
 cp -rf /home/$name/.backgrounds/* /usr/share/backgrounds/
-cp -rf /home/$name/.doom.d/exwm/exwm.desktop /usr/share/xsessions/exwm.desktop
-sed -i "s/~/\/home\/$name/" /usr/share/xsessions/exwm.desktop
 # Most important step! Install Doom Emacs
 dialog --infobox "Downloading and installing Doom Emacs..." 4 60
 sudo -u $name git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d" &>/dev/null
