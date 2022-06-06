@@ -188,15 +188,6 @@ installationloop
 
 
 #pull down lightdm-webkit-theme-litarvan
-dialog --infobox "Configuring lightdm theme..." 4 60
-git clone https://github.com/Litarvan/lightdm-webkit-theme-litarvan.git &>/dev/null
-cd lightdm-webkit-theme-litarvan
-./build.sh &>/dev/null
-mkdir /usr/share/lightdm-webkit/themes/litarvan
-cp lightdm-webkit-theme-litarvan* /usr/share/lightdm-webkit/themes/litarvan
-cd /usr/share/lightdm-webkit/themes/litarvan
-tar -xf lightdm-webkit-theme-litarvan* &>/dev/null
-
 rm -f "/home/$name/README.org"
 
 # make git ignore deleted LICENSE & README.md files
@@ -231,14 +222,8 @@ newperms "%wheel ALL=(ALL) ALL #AARBS
 
 # Getting dotfiles
 rm -rf /home/$name/.* 2>/dev/null
-sudo -u $name git clone --separate-git-dir=/home/$name/.dotfiles https://github.com/Hrothgar32/dotfiles /home/$name &>/dev/null
-cp -rf /home/$name/.lightdm/* /etc/lightdm
-cp -rf /home/$name/.backgrounds/* /usr/share/backgrounds/
+sudo -u $name git clone --separate-git-dir=/home/$name/dotfiles https://github.com/Hrothgar32/dotfiles /home/$name &>/dev/null
 # Most important step! Install Doom Emacs
-dialog --infobox "Downloading and installing Doom Emacs..." 4 60
-sudo -u $name git clone --depth 1 https://github.com/hlissner/doom-emacs "/home/$name/.emacs.d" &>/dev/null
-cd /home/$name/.emacs.d/bin
-sudo -u $name ./doom -y install &>/dev/null
 # Last message! Install complete!
 cd ~
 finalize
